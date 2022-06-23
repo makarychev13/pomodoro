@@ -5,11 +5,11 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/makarychev13/pomodoro/view"
+	"github.com/makarychev13/pomodoro/start"
 )
 
 func main() {
-	p := tea.NewProgram(view.NewStart())
+	p := tea.NewProgram(start.NewView())
 
 	if err := p.Start(); err != nil {
 		fmt.Printf("Не удалось запустить программу: %v", err)
