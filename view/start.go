@@ -1,15 +1,14 @@
-package start
+package view
 
 import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/makarychev13/pomodoro/progress"
-	"github.com/makarychev13/pomodoro/style"
+	"github.com/makarychev13/pomodoro/command"
 )
 
-//View описывает вид стартового экрана приложения.
-type View struct {
+//Start описывает вид стартового экрана приложения.
+type Start struct {
 	buttons []period
 	cursor  int
 }
@@ -19,8 +18,8 @@ type period struct {
 	text    string
 }
 
-func NewView() View {
-	return View{
+func NewStart() Start {
+	return Start{
 		buttons: []period{
 			{minutes: 25, text: "25 мин"},
 			{minutes: 15, text: "15 мин"},
@@ -29,27 +28,27 @@ func NewView() View {
 	}
 }
 
-func (s View) Init() tea.Cmd {
+func (s Start) Init() tea.Cmd {
 	return nil
 }
 
-func (s View) View() string {
+func (s Start) View() string {
 	var builder strings.Builder
 
 	builder.WriteString("Запустить таймер?\n\n")
 
 	for i, b := range s.buttons {
 		if i == s.cursor {
-			builder.WriteString(style.SelectedButton.Render(b.text))
+			builder.WriteString(selectedButtonStyle.Render(b.text))
 		} else {
-			builder.WriteString(style.UnselectedButton.Render(b.text))
+			builder.WriteString(unselectedButtonStyle.Render(b.text))
 		}
 	}
 
-	return style.MainWindow.Render(builder.String())
+	return mainWindowStyle.Render(builder.String())
 }
 
-func (s View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s Start) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -66,7 +65,7 @@ func (s View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				s.cursor = 0
 			}
 		case tea.KeyEnter.String(), tea.KeySpace.String(), tea.KeyRight.String():
-			return progress.NewView(s.buttons[s.cursor].minutes, 0), progress.NewTickCommand()
+			return NewProgress(s.buttons[s.cursor].minutes, 0), command.NewTick()
 		}
 	}
 

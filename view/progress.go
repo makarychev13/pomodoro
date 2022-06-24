@@ -1,11 +1,11 @@
-package progress
+package view
 
 import (
 	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/makarychev13/pomodoro/style"
+	"github.com/makarychev13/pomodoro/command"
 )
 
 const (
@@ -15,30 +15,34 @@ const (
 	restart = "Заново"
 )
 
-//View описывает оставшееся время помидорки.
-type View struct {
+//Progress описывает оставшееся время помидорки.
+type Progress struct {
 	remainMin int
 	remainSec int
+	startMin  int
+	startSec  int
 	cursor    int
 	buttons   []string
 	active    bool
 }
 
-func NewView(remainMin, remainSec int) View {
-	return View{
-		remainMin: remainMin,
-		remainSec: remainSec,
+func NewProgress(startMin, startSec int) Progress {
+	return Progress{
+		startMin:  startMin,
+		startSec:  startSec,
+		remainMin: startMin,
+		remainSec: startSec,
 		buttons:   []string{pause, restart, exit},
 		cursor:    0,
 		active:    true,
 	}
 }
 
-func (p View) Init() tea.Cmd {
+func (p Progress) Init() tea.Cmd {
 	return nil
 }
 
-func (p View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p Progress) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -64,12 +68,25 @@ func (p View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				} else if p.buttons[0] == run {
 					p.buttons[0] = pause
 					p.active = true
-					cmd = NewTickCommand()
+					cmd = command.NewTick()
 				}
+			}
+
+			if p.cursor == 1 {
+				p.remainMin = p.startMin
+				p.remainSec = p.startSec
+			}
+
+			if p.cursor == 2 {
+				return NewStart(), nil
 			}
 		}
 
-	case tickMsg:
+	case command.TickMsg:
+		if p.remainMin == 0 && p.remainSec == 0 {
+			return NewPause(1, 0, p.startMin), command.NewTick()
+		}
+
 		if p.active {
 			if p.remainSec == 0 {
 				p.remainMin--
@@ -78,25 +95,25 @@ func (p View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				p.remainSec--
 			}
 
-			cmd = NewTickCommand()
+			cmd = command.NewTick()
 		}
 	}
 
 	return p, cmd
 }
 
-func (p View) View() string {
+func (p Progress) View() string {
 	var builder strings.Builder
 
 	builder.WriteString(fmt.Sprintf("Осталось %d:%02d\n\n", p.remainMin, p.remainSec))
 
 	for i, b := range p.buttons {
 		if i == p.cursor {
-			builder.WriteString(style.SelectedButton.Render(b))
+			builder.WriteString(selectedButtonStyle.Render(b))
 		} else {
-			builder.WriteString(style.UnselectedButton.Render(b))
+			builder.WriteString(unselectedButtonStyle.Render(b))
 		}
 	}
 
-	return style.MainWindow.Render(builder.String())
+	return mainWindowStyle.Render(builder.String())
 }

@@ -1,10 +1,9 @@
-package style
+package view
 
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	//MainWindow описывает главное окно приложения.
-	MainWindow = lipgloss.NewStyle().
+	mainWindowStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("#171717")).
 			Foreground(lipgloss.Color("#bebebe")).
 			Width(44).
@@ -15,19 +14,17 @@ var (
 			BorderBackground(lipgloss.Color("#171717")).
 			Align(lipgloss.Center)
 
-	//SelectedButton описывает выбранную кнопку.
-	SelectedButton = lipgloss.NewStyle().
-			Background(lipgloss.Color("63")).
-			Foreground(lipgloss.Color("#bebebe")).
-			MarginLeft(1).
-			MarginRight(1).
-			PaddingLeft(1).
-			PaddingRight(1).
-			MarginBackground(lipgloss.Color("#171717")).
-			Align(lipgloss.Center)
+	selectedButtonStyle = lipgloss.NewStyle().
+				Background(lipgloss.Color("63")).
+				Foreground(lipgloss.Color("#bebebe")).
+				MarginLeft(1).
+				MarginRight(1).
+				PaddingLeft(1).
+				PaddingRight(1).
+				MarginBackground(lipgloss.Color("#171717")).
+				Align(lipgloss.Center)
 
-	//UnselectedButton описывает невыбранную кнопку.
-	UnselectedButton = lipgloss.NewStyle().
+	unselectedButtonStyle = lipgloss.NewStyle().
 				Background(lipgloss.Color("#878B7D")).
 				Foreground(lipgloss.Color("bebebe")).
 				MarginLeft(1).
