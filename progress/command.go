@@ -12,6 +12,7 @@ var (
 
 type tickMsg time.Time
 
+//NewTickCommand создаёт команду, которая по таймеру отправляет сообщение об уменьшении оставшегося времени помидорки.
 func NewTickCommand() tea.Cmd {
 	return func() tea.Msg {
 		return tick(timeout)
