@@ -5,12 +5,13 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/makarychev13/pomodoro/progress"
+	"github.com/makarychev13/pomodoro/style"
 )
 
 //View описывает вид стартового экрана приложения.
 type View struct {
-	ranges []period
-	cursor int
+	buttons []period
+	cursor  int
 }
 
 type period struct {
@@ -20,7 +21,7 @@ type period struct {
 
 func NewView() View {
 	return View{
-		ranges: []period{
+		buttons: []period{
 			{minutes: 25, text: "25 мин"},
 			{minutes: 15, text: "15 мин"},
 			{minutes: 5, text: "5 мин"},
@@ -37,15 +38,15 @@ func (s View) View() string {
 
 	builder.WriteString("Запустить таймер?\n\n")
 
-	for i, r := range s.ranges {
+	for i, b := range s.buttons {
 		if i == s.cursor {
-			builder.WriteString(selectedItemStyle.Render(r.text))
+			builder.WriteString(style.SelectedButton.Render(b.text))
 		} else {
-			builder.WriteString(unselectedItemStyle.Render(r.text))
+			builder.WriteString(style.UnselectedButton.Render(b.text))
 		}
 	}
 
-	return mainWindowStyle.Render(builder.String())
+	return style.MainWindow.Render(builder.String())
 }
 
 func (s View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -57,15 +58,15 @@ func (s View) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyLeft.String():
 			s.cursor--
 			if s.cursor < 0 {
-				s.cursor = len(s.ranges) - 1
+				s.cursor = len(s.buttons) - 1
 			}
 		case tea.KeyRight.String():
 			s.cursor++
-			if s.cursor == len(s.ranges) {
+			if s.cursor == len(s.buttons) {
 				s.cursor = 0
 			}
 		case tea.KeyEnter.String(), tea.KeySpace.String(), tea.KeyRight.String():
-			return progress.NewView(s.ranges[s.cursor].minutes, 0), progress.NewTickCommand()
+			return progress.NewView(s.buttons[s.cursor].minutes, 0), progress.NewTickCommand()
 		}
 	}
 
